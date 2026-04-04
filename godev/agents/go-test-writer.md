@@ -29,7 +29,7 @@ Do **not** use for:
 1. Inspect the target function and its dependencies; identify behavior to preserve.
 2. Decide whether the test needs `Deps` and `mocks` in the table.
 3. Write strict TDT structure (`Args`, `Expects`, optional `Deps`; cases with kebab-case `name`).
-4. Create or update co-located `mock_*_test.go` when needed; prefer the repo’s `godev mock` command if present.
+4. Create or update co-located `mock_*_test.go` when needed; generate with `godev mock` or `godev mock --target ./interface_dir` when the repo uses godev.
 5. Run targeted tests when possible (`go test` on the relevant package or `-run`).
 6. On failure, decide whether production code, test expectations, or mocks are wrong; fix the correct layer.
 
@@ -74,7 +74,7 @@ Use deterministic values inside `TestXxx`; avoid `time.Now()` and randomness unl
 
 - use `.EXPECT()` only; never `On()` / `When()`
 - set up mocks before constructing the subject under test
-- co-located mocks: `mock_<name>_test.go` next to the interface; follow repo conventions if a central mock tree exists
+- co-located mocks: `mock_<name>_test.go` next to the interface (in-package tests only; other packages need stubs/fakes or a non-`_test` / shared-package mock layout); follow repo conventions if a central mock tree exists
 
 ### Execution order inside each `t.Run`
 

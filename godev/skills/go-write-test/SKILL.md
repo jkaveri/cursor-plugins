@@ -45,7 +45,8 @@ Rules:
 - Mock setup must run **before** constructing the system under test.
 - Keep expectations minimal but strict (correct args/order/returns).
 - **Generated mock file placement:** Emit mocks **next to the interface** they implement, in the **same package**, with a `mock_` prefix and **`_test.go` suffix** so mocks compile only in tests and stay out of non-test binaries. Example: interface `Enricher` → `mock_enricher_test.go`.
-- Generate mocks with your project's command `godev mock`; if the repo still uses a central `./mock` tree, follow that repo's convention instead.
+- **Co-located `mock_*_test.go` mocks are package-local only:** Anything in `*_test.go` is compiled only when running `go test` for that same directory/package. It is not part of the importable API of that package for other packages. Tests in another package must not import or call `NewMock…` from another package’s `mock_*_test.go`—the compiler will not see those symbols (and you must not rely on cross-package test imports). **What to do instead for cross-package tests:** (1) Prefer a small hand-written stub/fake in the test file that implements the same interface, or (2) move tests into the same package as the interface (note: `foo` + `foo_test.go` in the same dir still cannot import another package’s test-only symbols—stubs remain the usual fix), or (3) if mocks must be shared across packages, generate them into a non-`_test` file or a dedicated importable package (tradeoff: testify in non-test builds or a separate test-only module pattern).
+- **Generate mocks:** Run `godev mock` (module-wide defaults), or scope to one directory with `godev mock --target ./interface_dir` (path to the package that defines the interface). If the repo still uses a central `./mock` tree, follow that repo's convention instead.
 
 ## 5) Execution flow (must be linear)
 Inside each `t.Run` use this order, exactly:
