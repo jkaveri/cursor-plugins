@@ -17,6 +17,11 @@
       "name": "gitworkflow",
       "source": "gitworkflow",
       "description": "Branch naming, commit drafting, staged-diff review, and PR summaries (skills + commands)."
+    },
+    {
+      "name": "specdocs",
+      "source": "specdocs",
+      "description": "Spec-driven docs: canonical docs/ layout (planning/roadmap, features, ideas), feature specs, ADRs, doc sync skills, commands, optional edit hook."
     }
   ]
 }

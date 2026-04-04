@@ -1,0 +1,111 @@
+---
+description: >
+  Canonical docs/ layout: planning (roadmap, feature list, ideas), architecture, decisions
+  (ADRs), per-feature specs, runbooks, and references. When to create or update which file,
+  ADR naming, and keeping product code aligned with documentation.
+globs:
+  - "docs/**/*.md"
+  - "**/*.go"
+  - "**/*.ts"
+  - "**/*.tsx"
+alwaysApply: false
+---
+
+# Spec-driven documentation
+
+Use the **default `docs/` tree** below unless the repository already standardizes a different layout (if so, follow the repo and mention the mapping in `docs/README.md`).
+
+## Canonical layout
+
+```text
+docs/
+  README.md
+  planning/
+    roadmap.md
+    features.md
+    ideas.md
+  architecture/
+    system-overview.md
+    folder-structure.md
+    integrations.md
+  decisions/
+    adr-001-<title>.md
+    adr-002-<title>.md
+  specs/
+    <feature-name>/
+      spec.md
+      plan.md
+      tasks.md
+      rollout.md
+      test-cases.md
+  runbooks/
+    local-development.md
+    release.md
+    incident-response.md
+  references/
+    api.md
+    domain-glossary.md
+```
+
+### `docs/README.md`
+
+- Entry point: what lives where, how specs and ADRs are written, and links to this rule or team handbook.
+
+### `docs/planning/`
+
+- **`roadmap.md`** — product or engineering roadmap: horizons, milestones, themes, and rough sequencing (not a substitute for per-feature **`spec.md`**—link out to **`docs/specs/<feature>/`**).
+- **`features.md`** — **feature inventory**: table or list with status (e.g. idea / planned / in progress / shipped), owner or area, and links to **`docs/specs/<feature>/`** when a spec exists.
+- **`ideas.md`** — unstructured or light backlog: candidate features and improvements to triage; promote items to **`features.md`** / **`roadmap.md`** or into a real spec folder when committed.
+
+### `docs/architecture/`
+
+- **System shape** that outlives a single feature: boundaries, major components, integrations.
+- Update when cross-cutting structure or external dependencies change—not for every small feature (those go under `docs/specs/<feature>/`).
+
+### `docs/decisions/` (ADRs)
+
+- **Filename:** `adr-<NNN>-<kebab-title>.md` with **three-digit** sequence (`001`, `002`, …) per repository.
+- **Content:** context, decision, consequences, alternatives; status (e.g. proposed / accepted / superseded).
+- **Superseding:** add a new ADR with a higher number; mark the old one superseded and link both ways.
+
+### `docs/specs/<feature-name>/`
+
+- **Folder name:** `kebab-case`, stable when possible (avoid renaming every time a package name shifts).
+- **Files:**
+  - **`spec.md`** — problem, goals, non-goals, user-visible behavior, acceptance themes.
+  - **`plan.md`** — approach, milestones, technical outline (not a dump of the whole diff).
+  - **`tasks.md`** — checklist the team can tick off.
+  - **`rollout.md`** — feature flags, migration, rollout order, rollback notes.
+  - **`test-cases.md`** — concrete, verifiable scenarios (Given/When/Then or equivalent).
+
+Start with **`spec.md`**; add other files when they add clarity.
+
+### `docs/runbooks/`
+
+- **Operations:** how to develop locally, release, and respond to incidents.
+- Update when commands, env vars, or on-call steps change.
+
+### `docs/references/`
+
+- **Long-lived lookups:** API sketches, domain glossary—material that is not a single feature spec and not an ADR.
+
+## When code changes
+
+- Map the change to the right doc:
+  - Feature behavior → `docs/specs/<feature>/` (usually `spec.md`, `rollout.md`, or `test-cases.md`).
+  - Roadmap or feature list out of date → `docs/planning/roadmap.md` or `docs/planning/features.md` (e.g. status, shipped dates, links).
+  - Cross-system or integration boundary → `docs/architecture/` or `docs/references/`.
+  - Irreversible architectural choice → new or updated ADR in `docs/decisions/`.
+  - Operator-facing steps → `docs/runbooks/`.
+
+## Lightweight review checklist
+
+- [ ] User-visible or API behavior is reflected in **`spec.md`** or **`references/`** as appropriate.
+- [ ] Rollout and risk are covered if the change ships progressively (**`rollout.md`**).
+- [ ] Tests or verification paths match **`test-cases.md`** (or the spec links to where they live).
+- [ ] ADR added or updated if the team is locking a significant design decision.
+- [ ] **`planning/features.md`** or **`planning/roadmap.md`** updated if the change affects advertised roadmap or feature status.
+
+---
+
+Prefer **small, accurate edits** over duplicating the same paragraph in three files; link between `spec.md`, `plan.md`, and code where it helps.

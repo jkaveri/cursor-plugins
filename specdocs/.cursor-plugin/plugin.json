@@ -1,0 +1,31 @@
+{
+  "name": "specdocs",
+  "displayName": "Spec-Driven Docs",
+  "version": "1.0.0",
+  "description": "Spec-driven documentation: canonical docs/ layout (planning/roadmap/features/ideas, specs, ADRs, runbooks), feature specs under docs/specs/, skills, commands, and an optional after-edit hook reminder.",
+  "author": {
+    "name": "jkaveri",
+    "email": "jkaveri@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/jkaveri/cursor-plugins",
+  "repository": "https://github.com/jkaveri/cursor-plugins",
+  "license": "MIT",
+  "keywords": [
+    "documentation",
+    "spec",
+    "specification",
+    "adr",
+    "architecture",
+    "runbook"
+  ],
+  "category": "developer-tools",
+  "tags": [
+    "docs",
+    "spec",
+    "adr"
+  ],
+  "skills": "./skills/",
+  "rules": "./rules/",
+  "commands": "./commands/",
+  "hooks": "./hooks.json"
+}

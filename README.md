@@ -6,6 +6,7 @@ This repository follows the [multi-plugin marketplace layout](https://github.com
 
 - `.cursor-plugin/marketplace.json` — marketplace name, owner, and the `plugins` array (each entry points at a subdirectory).
 - `<plugin-id>/` — one installable plugin (skills, rules, agents, MCP, etc. per [Cursor Plugins](https://cursor.com/docs/plugins)).
+- Included plugins in this repo include `godev/`, `gitworkflow/`, and `specdocs/` (spec-driven documentation: `docs/` layout, specs, ADRs, commands, hooks).
 
 ## Install locally (this machine)
 
