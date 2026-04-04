@@ -1,81 +1,72 @@
-# cursor-go-skills
+# Go Development (`godev`)
 
-Reusable **Cursor** rules (`.cursor/rules/*.mdc`) and agent skills (`.cursor/skills/*/SKILL.md`) for **Go** development (including strict table-driven tests via **`go-write-test`**). Copy or symlink this content into Go projects or into your personal Cursor skills directory.
+Cursor plugin with **Go project rules** (`.mdc`), **skills** (`SKILL.md`), and a **go-test-writer** agent for strict table-driven Go tests. It lives in the [`jkaveri/cursor-plugins`](https://github.com/jkaveri/cursor-plugins) multi-plugin repo; see the root [README](../README.md) for marketplace layout.
 
-This repository is packaged as a **[Cursor plugin](https://cursor.com/docs/plugins)** via [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json) (rules and skills paths match the layout described in the [plugin specification](https://github.com/cursor/plugins)). Install or add it from Cursor’s plugin UI when your Cursor version supports marketplace or local plugins.
+Manifest: [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json).
 
 ## Requirements
 
-- [Cursor](https://cursor.com) with **project rules** and **agent skills** available in your workflow (see Cursor documentation for how rules and skills are loaded in your version).
+- [Cursor](https://cursor.com) with support for **rules**, **skills**, and **agents** as loaded from installed plugins (see [Cursor Plugins](https://cursor.com/docs/plugins)).
 
-## Use in a Go project (recommended)
+## Install (recommended)
 
-1. Clone or download this repository.
-2. Copy the entire `.cursor/` directory into your Go project **root** (the same directory as `go.mod`).
-3. If the project already has `.cursor/`, **merge** instead of overwriting:
-   - Copy `.mdc` files into `.cursor/rules/`.
-   - Copy each skill folder into `.cursor/skills/` (avoid duplicate skill names).
-4. Open the Go project folder in Cursor.
-5. **Rules** apply when their `globs` match files you work with (and when Cursor includes them per your settings). **Skills** are selected by the agent when the task matches their `description`.
+From the **repository root** (`cursor-plugins`):
 
-## Git submodule (stay linked to upstream)
+```bash
+./scripts/install_cursor_local.py
+```
 
-1. Add this repo as a submodule, for example:
+That installs plugins listed in `.cursor-plugin/marketplace.json` under `~/.cursor/plugins/local/<name>/` and registers them. Use `./scripts/install_cursor_local.py --dry-run` to preview. **Restart Cursor** after installing.
 
-   ```bash
-   git submodule add <this-repo-url> third_party/cursor-go-skills
-   ```
+Add or enable the **godev** / **Go Development** plugin from Cursor’s plugin UI if your flow uses marketplace or local plugins.
 
-2. Copy or symlink from the submodule into your project root:
+## Layout (this plugin)
 
-   ```bash
-   cp -R third_party/cursor-go-skills/.cursor .
-   ```
+Paths are relative to the `godev/` folder:
 
-   After updating the submodule (`git submodule update --remote`), run the copy again or use a small script so `.cursor/` stays in sync.
+| Path | Role |
+|------|------|
+| [`rules/go-style.mdc`](rules/go-style.mdc) | Formatting, naming, errors, concurrency, packages; prefer repo `golangci-lint` / `godev` when present. |
+| [`rules/go-modules-tooling.mdc`](rules/go-modules-tooling.mdc) | **godev** CLI, **golangci-lint**, **gofumpt** / **golines**, verification, `go.mod` / `go.work`. |
+| [`skills/go-write-test/`](skills/go-write-test/) | Strict table-driven tests (Args / Expects / Deps), testify, mocks, arrange/act/assert. |
+| [`skills/go-code-review/`](skills/go-code-review/) | Go PR/diff review: correctness, concurrency, errors, tests, API. |
+| [`agents/go-test-writer.md`](agents/go-test-writer.md) | Sub-agent for writing/updating Go unit tests using the same strict TDT conventions as **go-write-test**. |
 
-3. **Alternative**: Open a multi-root workspace in Cursor that includes both your app and this repository (advanced; copying `.cursor/` into the app root is simpler).
+There is **no** bundled `examples/` tree in this plugin copy.
 
-## Global skills (all projects)
+## Use without the full marketplace (manual copy)
 
-To use the bundled skills in **every** workspace:
+If you are not using the plugin installer, you can mirror pieces into a Go project:
 
-1. Copy or symlink each skill directory into your user skills folder, for example:
+1. Copy `rules/*.mdc` into your project’s `.cursor/rules/` (merge with existing rules).
+2. Copy each folder under `skills/` into `.cursor/skills/` (avoid duplicate skill names).
+3. Copy `agents/go-test-writer.md` into `.cursor/agents/` if your Cursor version loads agents from the project.
 
-   ```bash
-   mkdir -p ~/.cursor/skills
-   ln -s /path/to/cursor-go-skills/.cursor/skills/go-code-review ~/.cursor/skills/go-code-review
-   ln -s /path/to/cursor-go-skills/.cursor/skills/go-change-workflow ~/.cursor/skills/go-change-workflow
-   ln -s /path/to/cursor-go-skills/.cursor/skills/go-write-test ~/.cursor/skills/go-write-test
-   ```
+Open the project in Cursor; rules apply when `globs` match, and skills/agents are picked when the task fits their descriptions.
 
-2. Do **not** install custom skills under `~/.cursor/skills-cursor/` — that directory is reserved for Cursor’s built-in skills.
+## Global skills (all workspaces)
 
-**Rules** are normally **project-local** (`.cursor/rules/` in each repo). To get the same Go rules everywhere, copy `.cursor/rules/` into each repository or use Cursor **user rules** for global guidance outside this pack.
+To use a skill in **every** workspace, symlink it into your user skills directory, for example:
 
-## Verify it works
+```bash
+mkdir -p ~/.cursor/skills
+ln -s /path/to/cursor-plugins/godev/skills/go-code-review ~/.cursor/skills/go-code-review
+ln -s /path/to/cursor-plugins/godev/skills/go-write-test ~/.cursor/skills/go-write-test
+```
 
-1. Open a `.go` file in your project and confirm project rules appear in Cursor’s rules UI (wording and location depend on your Cursor version).
-2. Ask the agent to do something that matches a skill, for example: “Review this Go change using the Go code review skill”, “Follow the Go change workflow for this fix”, or “Add Go tests using the go-write-test skill.”
+Do **not** use `~/.cursor/skills-cursor/` for custom skills—that area is reserved for Cursor’s built-in skills.
+
+**Rules** are usually project-local; copy `rules/` into each repo’s `.cursor/rules/` or use Cursor **user rules** for global Go guidance.
+
+## Verify
+
+1. Open a `.go` file and confirm the Go rules show up where your Cursor version lists project rules.
+2. Try prompts that match a skill or agent, e.g. “Review this Go change with the Go code review skill” or “Add tests using strict TDT / go-write-test.”
 
 ## Updating
 
-Pull the latest changes in this repository, then repeat the copy, symlink, or submodule sync step so your project’s `.cursor/` (or `~/.cursor/skills`) matches.
+Pull `cursor-plugins`, rerun `./scripts/install_cursor_local.py` (or sync your manual copies / symlinks).
 
 ## Customizing
 
-Edit the `.mdc` files and `SKILL.md` files to match your team, or fork this repository. Prefer **one main concern per rule file** to keep context use small and predictable.
-
-## Contents
-
-| Path | Purpose |
-|------|---------|
-| `.cursor/rules/go-style.mdc` | Errors, context, naming, packages |
-| `.cursor/rules/go-modules-tooling.mdc` | `go mod`, vet, lint, dependencies |
-| `.cursor/skills/go-write-test/` | Strict Go TDT (Args/Expects/Deps), testify, mocks — use via skill |
-| `.cursor/skills/go-code-review/` | PR / diff review checklist |
-| `.cursor/skills/go-change-workflow/` | Implement → test → tidy workflow |
-
-## Example module
-
-The [`examples/`](examples/) directory contains a runnable nested Go module ([`examples/demo`](examples/demo)) that exercises the bundled rules and skills. See [`examples/README.md`](examples/README.md) for layout, symlink notes, and how each package maps to the rules and skills.
+Edit the `.mdc` files, `SKILL.md` files, or the agent markdown to match your team; prefer **one main concern per rule file** to keep context small and predictable. Fork or vendor the `godev/` tree if you need a long-lived fork.
