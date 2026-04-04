@@ -1,0 +1,148 @@
+---
+description: >
+  Structured logging with github.com/jkaveri/golog/v2: levels (Debug, Info, Error),
+  WithContext, slog-style Attrs, WithError, optional enrichers, and call-chain rules so
+  Error is not duplicated—inner layers often use Info when a boundary logger owns Error.
+  Use when writing or reviewing Go logging, handlers, or wiring loggers.
+globs:
+  - "**/*.go"
+alwaysApply: false
+---
+
+# Go logging (`golog/v2`)
+
+Prefer **`github.com/jkaveri/golog/v2`** for application logging. The **`Logger`** interface exposes **`Debug`**, **`Info`**, **`Error`**, **`With`**, **`WithContext`**, and **`WithError`**; attributes use **`Attr`** helpers (`String`, `Int`, `Group`, …)—see the [v2 README](https://github.com/jkaveri/golog/blob/main/v2/README.md) and [pkg.go.dev](https://pkg.go.dev/github.com/jkaveri/golog/v2).
+
+Bootstrap with **`golog.NewLogger(golog.Config{...})`** or presets from **`github.com/jkaveri/golog/v2/config`** (e.g. **`Development()`**, **`Production()`**). For package-level helpers, **`golog.InitDefault(...)`** sets the default logger used by **`golog.Info`** / **`golog.WithContext`**, etc.
+
+**Philosophy:** Prefer fewer, clearer signals—not every `if err != nil` deserves an **`Error`** line. See [Let’s talk about logging](https://dave.cheney.net/2015/11/05/lets-talk-about-logging) (Dave Cheney) on avoiding excess levels and treating many failure paths as informational when the error is returned or handled without being the final observability boundary.
+
+---
+
+## Allowed levels
+
+- Use only:
+  - **`Debug(...)`** — diagnostic detail (developers / support).
+  - **`Info(...)`** — normal operation, recoverable paths, *and* “this `error` happened here but we are **not** the final log boundary” (often with **`WithError(err)`**).
+  - **`Error(...)`** — reserve for the **authoritative** failure record when this layer **owns** the outcome and no outer component will emit the primary error log for that incident (see **Error severity and call chain** below).
+- There is **no** `Warn` on **`Logger`**; use **`Info`** with clear wording.
+- Do **not** treat **`Error`** as “there is an `error` value in scope”—see the next section.
+
+---
+
+## Error severity and call chain
+
+**Goal:** at most **one** **`Error`** log per logical failure that operators should page on—or one clear owner per request/job boundary. Avoid the same failure at **`Error`** in both middleware **and** handler.
+
+- **Boundary / end of chain** (e.g. HTTP **middleware** that logs the response error, top-level **worker**, **`main`**): this is the right place for **`log.WithError(err).Error("…")`** when the request/command **ends in failure** and this code is the last place that records it for observability.
+- **Inner layers** (handler, service) that **return** `err` to such a boundary:
+  - If the **outer** layer already logs at **`Error`**, **do not** log again at **`Error`** inside the handler—prefer **`return err`** only, or a single **`Info`** with **`WithError(err)`** if you need a breadcrumb for this layer (e.g. “downstream call failed, returning to middleware”).
+  - Do **not** duplicate **`Error`** for the same incident up the stack unless each line adds **new** operational context worth a separate alert.
+
+**Summary:** use **`Error`** where the **calling chain ends** for observability of that failure; use **`Info`** (often with **`WithError`**) when you are **mid-chain** and something else will record the failure at **`Error`**, or when you handled the problem and the message is informational (see Cheney’s examples).
+
+---
+
+## Context handling (mandatory)
+
+In any function that accepts **`context.Context`**:
+
+- **Derive a context-aware logger at the start** and use it for all logs in that function:
+
+  ```go
+  log := log.WithContext(ctx)
+  ```
+
+- **`WithContext`** attaches `ctx` so **enrichers** (e.g. **`NewContextEnricher`** with **`FromContext`**) can map context values to attributes (e.g. `request_id`, `user_id`). The context is not automatically printed unless an enricher copies it into the record.
+- Do **not** mix context-aware and non-context-aware loggers in the same function for the same work unit.
+
+---
+
+## Message formatting
+
+- Messages **SHOULD** be human-readable and **in English**.
+- Prefer **lowercase** message strings (consistent with line-oriented output).
+- Interpolation belongs in **attributes** (`String`, `Int`, …) or the message string when it stays readable—avoid stuffing identifiers **only** into free-form text; use structured fields for searchability.
+
+---
+
+## Structured fields (`Attr`)
+
+- Pass attributes as variadic **`Attr`** values on each call: **`log.Info("msg", golog.String("k", v), ...)`**.
+- Use **`golog.With(attrs...)`** on the logger for request-scoped or component-scoped fields repeated across many lines (same idea as pre-bound fields, without repeating at every call site).
+- Prefer **stable keys** for identifiers and dimensions, for example: `request_id`, `trace_id`, `user_id`, `entity_id`, `job_id`, `component`, `operation`, `status`.
+- Use **`golog.Group("name", ...)`** to group related attributes; in text output, group keys prefix children (e.g. `request.id=…`).
+
+---
+
+## Error logging (API mechanics)
+
+- Use **`log.WithError(err)`** with **`Error(...)`** or **`Info(...)`** when the log line should include the error string (**`nil`** leaves the logger unchanged).
+- Prefer **one** authoritative **`Error`** per failure path at the chosen boundary; inner layers use **`Info` + `WithError`** or return without logging.
+
+---
+
+## Level selection (summary)
+
+| Level  | Use for |
+|--------|---------|
+| Debug  | Verbose diagnostics; optional per-package verbosity. |
+| Info   | Steady-state operation; **mid-chain** failure context (**`WithError`**) when an **outer** layer will log **`Error`**; handled recoverable paths. |
+| Error  | **Boundary** where the failure is **finally** recorded for operators—e.g. middleware after handler returns `err`, or **`main`** when the process cannot continue. |
+
+---
+
+## Prohibited patterns
+
+- Using a **Warn**-style API (not in `golog/v2` `Logger`).
+- **`Error`** at **every** layer for the **same** incident when middleware (or similar) already logs **`Error`** for that request.
+- Logging **without** **`WithContext(ctx)`** when `ctx` is available and the work is request-scoped.
+- Logging **secrets**, tokens, credentials, or **PII** (or logging full request/response bodies).
+
+---
+
+## Examples
+
+**Handler when middleware logs failures at `Error`:** return the error; optional **`Info`** breadcrumb—not a second **`Error`**.
+
+```go
+import (
+    "context"
+
+    golog "github.com/jkaveri/golog/v2"
+)
+
+func Handle(ctx context.Context, log golog.Logger) error {
+    log = log.WithContext(ctx)
+
+    if err := doWork(ctx); err != nil {
+        // Middleware will log this failure at Error—do not duplicate Error here.
+        log.WithError(err).Info("request handler: work failed, returning to middleware")
+        return err
+    }
+    return nil
+}
+```
+
+**Boundary (e.g. no outer logger):** **`Error`** is appropriate.
+
+```go
+func Run(ctx context.Context, log golog.Logger) error {
+    log = log.WithContext(ctx)
+    if err := doWork(ctx); err != nil {
+        log.WithError(err).Error("run aborted")
+        return err
+    }
+    return nil
+}
+```
+
+**Scoped logger with `With`**
+
+```go
+reqLog := log.WithContext(ctx).With(
+    golog.String("component", "api"),
+    golog.String("operation", "create_order"),
+)
+reqLog.Info("processing")
+```

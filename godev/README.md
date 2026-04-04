@@ -28,8 +28,10 @@ Paths are relative to the `godev/` folder:
 |------|------|
 | [`rules/go-style.mdc`](rules/go-style.mdc) | Formatting, naming, errors, concurrency, packages; prefer repo `golangci-lint` / `godev` when present. |
 | [`rules/go-modules-tooling.mdc`](rules/go-modules-tooling.mdc) | **godev** CLI, **golangci-lint**, **gofumpt** / **golines**, verification, `go.mod` / `go.work`. |
+| [`rules/go-logging.mdc`](rules/go-logging.mdc) | Structured logging with **golog/v2** (`WithContext`, `Attr`, `WithError`, levels). |
 | [`skills/go-write-test/`](skills/go-write-test/) | Strict table-driven tests (Args / Expects / Deps), testify, mocks, arrange/act/assert. |
 | [`skills/go-code-review/`](skills/go-code-review/) | Go PR/diff review: correctness, concurrency, errors, tests, API. |
+| [`skills/go-logging-audit/`](skills/go-logging-audit/) | Audit **logging patterns and levels** in a file or package; improve **golog/v2** usage (not a general code review). |
 | [`agents/go-test-writer.md`](agents/go-test-writer.md) | Sub-agent for writing/updating Go unit tests using the same strict TDT conventions as **go-write-test**. |
 
 There is **no** bundled `examples/` tree in this plugin copy.
