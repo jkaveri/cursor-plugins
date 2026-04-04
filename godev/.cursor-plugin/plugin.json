@@ -1,0 +1,31 @@
+{
+  "name": "godev",
+  "displayName": "Go Development",
+  "version": "1.0.0",
+  "description": "Go project rules (style, modules/tooling) and skills for table-driven tests (go-write-test) and structured Go code review (go-code-review).",
+  "author": {
+    "name": "jkaveri",
+    "email": "jkaveri@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/jkaveri/cursor-plugins",
+  "repository": "https://github.com/jkaveri/cursor-plugins",
+  "license": "MIT",
+  "keywords": [
+    "go",
+    "golang",
+    "testing",
+    "go-modules",
+    "code-review",
+    "table-driven-tests"
+  ],
+  "category": "developer-tools",
+  "tags": [
+    "go",
+    "golang",
+    "testing",
+    "review"
+  ],
+  "skills": "./skills/",
+  "rules": "./rules/",
+  "agents": "./agents/"
+}

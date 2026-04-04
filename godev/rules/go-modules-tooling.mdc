@@ -1,0 +1,48 @@
+---
+description: >
+  Preferred Go toolchain (godev, golangci-lint, gofumpt/golines).
+  Use when running dev commands or editing go.mod.
+globs: "**/*.go,go.mod,go.sum,go.work,.golangci.yml"
+alwaysApply: false
+---
+
+# Preferred tools and packages
+
+Prefer this stack for new work. **Repository READMEs and pkg.go.dev** are authoritative for APIs, versions, and breaking changes—refresh from there before major upgrades.
+
+Day-to-day **formatting and lint commands** (including when to run `--fix`) are summarized in **`go-style.mdc`**; this file focuses on *what* to prefer.
+
+---
+
+## Toolchain
+
+### godev (primary CLI)
+
+Use **[godev](https://github.com/jkaveri/godev)** as the unified CLI for the full Go development loop when the project supports it: build, test, lint, mocks, modules, coverage, CI helpers, and more.
+
+- **Docs:** [README on GitHub](https://github.com/jkaveri/godev/blob/main/README.md) (or `godev/README.md` in a local clone). **Subcommands, flags, and behavior** are defined there—do not guess; read or run `--help`.
+- **Install:** `go install github.com/jkaveri/godev/cmd/godev@latest`
+- **Discoverability:** `godev --help`, `godev <command> --help`. Root flags include `--no-color` (also `NO_COLOR`, `GODEV_NO_COLOR`).
+- **Typical commands** (see README for the full list): `build`, `changed`, `ci`, `test` (including config generation), `lint` (including **golangci-lint config generation**), `clean`, `mod`, `mock`, `work`, `version`, `coverprofile`, `release`, `github-release`, `commit`.
+
+Fall back to plain `go`, `make`, or project scripts when `godev` is not adopted.
+
+### Linting: golangci-lint (via godev)
+
+- **golangci-lint** is the preferred linter aggregator.
+- Prefer invoking it through **`godev lint`** when available so versions and config stay aligned with the team.
+- To **bootstrap or regenerate** `.golangci.yml`, use **`godev lint golangci-config`** (or the equivalent documented in the godev README), then tune `linters`, `formatters`, and `exclusions` for the module.
+
+### Formatting: gofumpt and golines (via golangci-lint)
+
+- Prefer **gofumpt** and **golines** for formatting style (stricter than `gofmt` alone; line-length handling for long signatures and calls).
+- Run them **through the repo’s golangci-lint setup** (e.g. `formatters` in `.golangci.yml`) or **`godev lint -f`** / the project’s documented fix command—avoid one-off manual invocations unless the README says otherwise.
+
+## Verification
+
+- Prefer **`godev lint`** / **`godev ci`** when available; otherwise follow CI and `go vet ./...`.
+- Keep `.golangci.yml` aligned with **`godev lint golangci-config`** when you generate or refresh config.
+
+## `go.mod` / `go.work`
+
+When editing module files, run tidy and verify builds—do not hand-edit `replace` directives without reviewing impact on consumers.

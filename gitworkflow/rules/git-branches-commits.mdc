@@ -1,0 +1,11 @@
+---
+description: Declarative Git naming and commit policy for the gitworkflow plugin (branch prefixes, commits, review scope).
+alwaysApply: false
+---
+
+# Git policy (declarative)
+
+- **Branches:** `<type>/<short-kebab-slug>` — types include `feat`, `fix`, `chore`, `docs`, `refactor`, `test`; slug is lowercase, hyphens, no ticket wrappers unless the repo already uses them.
+- **Commits:** Imperative subject (~72 chars); body optional, explains *why* when unclear. Match **Conventional Commits** (`feat:`, `fix:`, …) if the repo already does.
+- **Review scope:** Prefer reviewing **staged** changes (`git diff --cached`) unless the user asks for the full working tree.
+- **PR summaries:** Title states user-visible outcome; body lists scope, risk, and how to verify—no stack traces or raw diff dumps as the only description.

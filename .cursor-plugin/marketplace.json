@@ -1,0 +1,22 @@
+{
+  "name": "JK Stacks",
+  "owner": {
+    "name": "jkaveri",
+    "email": "jkaveri@users.noreply.github.com"
+  },
+  "metadata": {
+    "description": "Community Cursor plugin marketplace: rules, skills, and agents you can install together or per-plugin."
+  },
+  "plugins": [
+    {
+      "name": "godev",
+      "source": "godev",
+      "description": "Go rules (style, modules/tooling) and skills for TDT tests and Go code review."
+    },
+    {
+      "name": "gitworkflow",
+      "source": "gitworkflow",
+      "description": "Branch naming, commit drafting, staged-diff review, and PR summaries (skills + commands)."
+    }
+  ]
+}

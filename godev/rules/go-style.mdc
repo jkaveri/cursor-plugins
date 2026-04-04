@@ -1,0 +1,125 @@
+---
+description: >
+  Portable Go coding standards for formatting, naming, comments, errors,
+  concurrency, package design, and tooling. Use for Go files and prefer the
+  repository's `.golangci.yml`, `godev`, and existing project conventions when
+  they exist.
+globs:
+  - "**/*.go"
+alwaysApply: false
+---
+
+# Formatting
+
+* **Prefer repo-configured formatting:** If the repo has `.golangci.yml`, run
+  `golangci-lint run --fix` so formatting follows shared `formatters` settings
+  such as `gofumpt` and `golines`. If the repo uses `godev`, prefer
+  `godev lint -f` or the repo's documented lint command.
+* **Generate lint config consistently:** If a repo does not yet have a
+  `.golangci.yml`, use `godev lint golangci-config` as a starting point, then
+  tune `formatters`, `linters`, and `exclusions` for that module.
+* **Fall back to standard tools:** If there is no shared lint config, use
+  `gofmt` and `goimports`.
+* **Struct and field initialisation:** Prefer struct literals and design types
+  so their zero value is useful when practical.
+* **Declare empty slices properly:** Represent an unknown or zero-length slice
+  with a nil slice (`var s []T`). Use `[]T{}` only when a non-nil zero-length
+  slice is required.
+
+# Documentation and comments
+
+* **Doc comments:** Provide a full-sentence comment for every top-level
+  exported name and any nontrivial unexported type. The comment should
+  immediately precede the declaration and begin with the name.
+* **Comment style:** Use simple prose and complete sentences. Avoid excessive
+  boilerplate; the comment should explain *what* something does, not how.
+
+# Naming conventions
+
+* **Package names:** Use short, lower-case, unbroken names with no
+  underscores. Avoid generic names like `util` or `common`, names that
+  conflict with common variables (e.g., `errors`), and names likely to be
+  shadowed. Test packages can use the `_test` suffix.
+* **Types and variables:** Choose names whose length matches their scope. Very
+  short names (`i`, `j`, `r`, `w`) are fine for local indices or receivers;
+  longer descriptive names are appropriate for broader scope. Avoid dropping
+  letters from words, and omit type information when usage makes it obvious
+  (e.g., `db` rather than `database`).
+* **Receiver names:** For methods, use a short receiver name derived from the
+  type; keep it consistent within the type and avoid underscores.
+* **Constants:** Use MixedCaps (camel case) for constant names. Exported
+  constants start with an uppercase letter. Avoid naming constants after their
+  literal value (`MaxBufferSize`, not `MAX_BUFFER_SIZE`).
+* **Initialisms and acronyms:** Preserve the case of common initialisms. Use
+  `URL`, `API`, and `HTML`, not `Url` or `Html`. When a name starts with an
+  initialism, ensure the exported/unexported rule is honored (e.g.,
+  `HTTPServer` vs `httpServer`).
+* **Avoid `Get` prefixes:** Simple accessors should be named after the
+  property (e.g., `Name()` instead of `GetName()`). Use verbs like `Compute` or
+  `Fetch` for methods that perform heavy work or remote calls.
+* **Naming pattern:** Use nouns for structs (`Replica`, `Request`), active nouns
+  ending in `-er` for interfaces (`Reader`, `Writer`), and verbs for functions
+  and methods (`Read`, `Process`).
+* **Avoid repetition:** Do not repeat package names in identifiers. Exported
+  functions should be concise, e.g., `widget.New` rather than `widget.NewWidget`.
+
+# Error handling
+
+* **Errors are values:** Return errors as values and handle them promptly. Do
+  not ignore errors or discard them using `_`. Use `errors.Is` or `errors.As`
+  to inspect wrapped errors rather than string comparisons.
+* **Error strings:** Error messages should be concise, start with a lower-case
+  letter, and end without punctuation. Wrap errors with useful context, e.g.
+  `fmt.Errorf("load config: %w", err)`, to preserve the underlying error.
+* **Don't panic:** Reserve `panic` for truly exceptional situations like
+  unrecoverable programmer bugs. For normal error conditions, return an error
+  instead.
+
+# Concurrency
+
+* **Choose the simplest primitive:** Use channels for ownership transfer,
+  coordination, and pipelines. Use mutexes or atomics when protecting shared
+  state is simpler and clearer.
+* **Concurrency vs parallelism:** Understand that concurrency is about
+  structuring programs; it does not guarantee parallel execution.
+* **Goroutine lifetimes:** Ensure every goroutine has a clear lifetime. Document
+  when and how they exit, and avoid leaks by using contexts or channels to
+  signal cancellation.
+
+# Interfaces and design
+
+* **Small interfaces:** Design small, focused interfaces that capture a single
+  responsibility and compose larger behavior from them.
+* **Composition over inheritance:** Go has no class inheritance; build behavior
+  by **composing** and **embedding** smaller structs and interfaces rather than
+  deep type hierarchies.
+* **Interfaces for testability:** For low-level dependencies (I/O, DB, HTTP,
+  filesystem) or behavior that is hard to control in tests (time, randomness,
+  IDs, external services), depend on a **small interface** describing what your
+  package actually needs—not the full concrete client type. Wire real
+  implementations at the edge (`main`, HTTP handlers); in tests, swap in fakes
+  or mocks. Prefer defining the interface at the **consumer** when practical
+  (“accept interfaces, return concrete types”).
+* **Zero-value usefulness:** Design types such that the zero value is
+  immediately usable where practical (e.g., `sync.Mutex`, `bytes.Buffer`).
+* **Prefer copying to dependencies:** When a piece of code is small, copy it
+  rather than introduce a new dependency; a little copying is often better than
+  a little dependency.
+* **Clarity over cleverness:** Write simple, clear code rather than clever
+  one-liners. Avoid reflection when other patterns suffice.
+
+# Project organisation
+
+* **Layout follows repo needs:** Use `/cmd/<tool>` for binaries. For libraries,
+  organize packages by responsibility and API boundaries; do not force `/pkg`
+  or `/internal` unless they improve clarity for that repository.
+* **Avoid package globals for config:** Parse config near the program boundary
+  and pass dependencies explicitly. Use `flag` for small CLIs; otherwise follow
+  the repo's CLI/config stack.
+
+# Tooling and review
+
+* **Use vet and linters:** Run `go vet` and other linters such as
+  `staticcheck` or `golangci-lint` as part of CI and local verification.
+* **Follow Go code review comments:** Treat the Go Code Review Comments
+  document as the baseline for stylistic decisions and naming conventions.
