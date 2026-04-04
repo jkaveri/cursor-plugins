@@ -100,6 +100,15 @@ alwaysApply: false
   implementations at the edge (`main`, HTTP handlers); in tests, swap in fakes
   or mocks. Prefer defining the interface at the **consumer** when practical
   (“accept interfaces, return concrete types”).
+* **Co-located mockery mocks (`mock_*_test.go`):** `mock_*_test.go` mocks are
+  for in-package tests only; other packages use fakes/stubs or a different mock
+  layout. Go compiles `*_test.go` only when running `go test` for that
+  directory/package, so generated `NewMock…` types are not part of the
+  importable API for other packages—do not import them from another package’s
+  tests. For cross-package tests: prefer a small hand-written stub/fake in the
+  test file, move tests into the interface’s package, or generate shared mocks
+  into non-`_test` code or a dedicated importable package (tradeoff: testify in
+  non-test builds or a test-only module pattern).
 * **Zero-value usefulness:** Design types such that the zero value is
   immediately usable where practical (e.g., `sync.Mutex`, `bytes.Buffer`).
 * **Prefer copying to dependencies:** When a piece of code is small, copy it
