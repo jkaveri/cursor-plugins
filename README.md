@@ -7,7 +7,7 @@ A multi-tool plugin marketplace compatible with both **Cursor** and **Claude Cod
 | Plugin | Description |
 |---|---|
 | `godev` | Go rules (style, modules/tooling, logging), table-driven test writer, code review, logging audit |
-| `gitworkflow` | Branch naming, commit drafting, staged-diff review, PR summary generation |
+| `gitworkflow` | Branch + commit, commit-only, staged-diff review, PR summaries |
 | `specdocs` | Spec-driven docs: canonical `docs/` layout, feature specs, ADRs, doc sync, optional edit hook |
 
 ## Layout

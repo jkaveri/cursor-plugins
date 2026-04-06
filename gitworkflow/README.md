@@ -1,6 +1,6 @@
 # Git Workflow (`gitworkflow`)
 
-Cursor plugin for **branch naming**, **commit message drafting**, **staged-diff review**, and **PR summaries** via four **skills** and matching **commands**, plus a small **rule** file for naming and review scope.
+Cursor plugin for **branch + commit**, **commit-only**, **staged-diff review**, and **PR summaries** via four **skills** and four **commands**, plus a small **rule** file for naming and review scope.
 
 It lives in [`jkaveri/cursor-plugins`](https://github.com/jkaveri/cursor-plugins); see the root [README](../README.md) for marketplace layout.
 
@@ -33,8 +33,8 @@ Paths are relative to the `gitworkflow/` folder:
 | [`skills/prepare-commit/`](skills/prepare-commit/) | Inspect **staged** diff; split commits when needed; draft imperative (optionally Conventional) messages. |
 | [`skills/review-staged-changes/`](skills/review-staged-changes/) | Structured review of **`git diff --cached`** (correctness, tests, risk). |
 | [`skills/draft-pr-summary/`](skills/draft-pr-summary/) | PR title and Markdown body from branch, commits, and context. |
-| [`commands/git-branch-name.md`](commands/git-branch-name.md) | Command prompt wired to **create-branch**. |
-| [`commands/git-commit-draft.md`](commands/git-commit-draft.md) | Command prompt wired to **prepare-commit**. |
+| [`commands/git-branch-and-commit.md`](commands/git-branch-and-commit.md) | Create a branch from staged diff (or working tree if nothing staged), draft message, and **commit**—uses **create-branch** + **prepare-commit**. |
+| [`commands/git-commit.md`](commands/git-commit.md) | Draft message and **commit** on the current branch only (staged preferred, else working tree)—**prepare-commit**; no new branch. |
 | [`commands/git-review-staged.md`](commands/git-review-staged.md) | Command prompt wired to **review-staged-changes**. |
 | [`commands/git-pr-draft.md`](commands/git-pr-draft.md) | Command prompt wired to **draft-pr-summary**. |
 
