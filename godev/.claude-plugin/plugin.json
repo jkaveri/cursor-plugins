@@ -11,6 +11,5 @@
   "license": "MIT",
   "keywords": ["go", "golang", "testing", "go-modules", "code-review", "logging", "table-driven-tests"],
   "skills": "./skills/",
-  "rules": "./rules/",
-  "agents": "./agents/"
+  "rules": "./rules/"
 }
