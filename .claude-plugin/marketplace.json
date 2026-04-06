@@ -1,0 +1,61 @@
+{
+  "name": "jk-stacks",
+  "owner": {
+    "name": "jkaveri",
+    "email": "jkaveri@users.noreply.github.com"
+  },
+  "metadata": {
+    "description": "Community plugin marketplace: Go development, Git workflow, and Spec-driven docs — rules, skills, agents, and commands.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "godev",
+      "source": "./godev",
+      "description": "Go rules (style, modules/tooling, logging) and skills for table-driven tests, code review, and logging audit.",
+      "version": "1.0.0",
+      "author": {
+        "name": "jkaveri",
+        "email": "jkaveri@users.noreply.github.com"
+      },
+      "homepage": "https://github.com/jkaveri/cursor-plugins",
+      "repository": "https://github.com/jkaveri/cursor-plugins",
+      "license": "MIT",
+      "keywords": ["go", "golang", "testing", "code-review", "logging", "table-driven-tests"],
+      "category": "developer-tools",
+      "tags": ["go", "golang", "testing", "review"]
+    },
+    {
+      "name": "gitworkflow",
+      "source": "./gitworkflow",
+      "description": "Branch naming, commit drafting, staged-diff review, and PR summary generation.",
+      "version": "1.0.0",
+      "author": {
+        "name": "jkaveri",
+        "email": "jkaveri@users.noreply.github.com"
+      },
+      "homepage": "https://github.com/jkaveri/cursor-plugins",
+      "repository": "https://github.com/jkaveri/cursor-plugins",
+      "license": "MIT",
+      "keywords": ["git", "branch", "commit", "pull-request", "code-review"],
+      "category": "developer-tools",
+      "tags": ["git", "workflow", "pr"]
+    },
+    {
+      "name": "specdocs",
+      "source": "./specdocs",
+      "description": "Spec-driven docs: canonical docs/ layout, feature specs, ADRs, doc sync skills, commands, and optional edit hook.",
+      "version": "1.0.0",
+      "author": {
+        "name": "jkaveri",
+        "email": "jkaveri@users.noreply.github.com"
+      },
+      "homepage": "https://github.com/jkaveri/cursor-plugins",
+      "repository": "https://github.com/jkaveri/cursor-plugins",
+      "license": "MIT",
+      "keywords": ["documentation", "spec", "specification", "adr", "architecture", "runbook"],
+      "category": "developer-tools",
+      "tags": ["docs", "spec", "adr"]
+    }
+  ]
+}

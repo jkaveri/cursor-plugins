@@ -1,14 +1,61 @@
-# Cursor plugins marketplace
+# Plugin Marketplace
 
-This repository follows the [multi-plugin marketplace layout](https://github.com/cursor/plugins): one root manifest lists every plugin; each plugin is a folder with its own `.cursor-plugin/plugin.json`.
+A multi-tool plugin marketplace compatible with both **Cursor** and **Claude Code**. One root manifest lists every plugin; each plugin is a folder with its own manifests.
+
+## Plugins
+
+| Plugin | Description |
+|---|---|
+| `godev` | Go rules (style, modules/tooling, logging), table-driven test writer, code review, logging audit |
+| `gitworkflow` | Branch naming, commit drafting, staged-diff review, PR summary generation |
+| `specdocs` | Spec-driven docs: canonical `docs/` layout, feature specs, ADRs, doc sync, optional edit hook |
 
 ## Layout
 
-- `.cursor-plugin/marketplace.json` — marketplace name, owner, and the `plugins` array (each entry points at a subdirectory).
-- `<plugin-id>/` — one installable plugin (skills, rules, agents, MCP, etc. per [Cursor Plugins](https://cursor.com/docs/plugins)).
-- Included plugins in this repo include `godev/`, `gitworkflow/`, and `specdocs/` (spec-driven documentation: `docs/` layout, specs, ADRs, commands, hooks).
+```
+.cursor-plugin/marketplace.json   # Cursor marketplace manifest
+.claude-plugin/marketplace.json   # Claude Code marketplace manifest
+<plugin-id>/
+  .cursor-plugin/plugin.json      # Cursor plugin manifest
+  .claude-plugin/plugin.json      # Claude Code plugin manifest
+  skills/  rules/  commands/  agents/  hooks.json
+```
 
-## Install locally (this machine)
+## Install — Claude Code
+
+Add this repo as a marketplace, then install individual plugins:
+
+```bash
+# Add the marketplace
+/plugin marketplace add jkaveri/cursor-plugins
+
+# Install a plugin
+/plugin install godev@jk-stacks
+/plugin install gitworkflow@jk-stacks
+/plugin install specdocs@jk-stacks
+```
+
+Or configure it in your project’s `.claude/settings.json` for team auto-discovery:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "jk-stacks": {
+      "source": {
+        "source": "github",
+        "repo": "jkaveri/cursor-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "godev@jk-stacks": true,
+    "gitworkflow@jk-stacks": true,
+    "specdocs@jk-stacks": true
+  }
+}
+```
+
+## Install — Cursor (local)
 
 From the repo root:
 
@@ -16,12 +63,14 @@ From the repo root:
 ./scripts/install_cursor_local.py
 ```
 
-This copies each plugin listed in `.cursor-plugin/marketplace.json` into `~/.cursor/plugins/local/<name>/` (real copies, not symlinks), mirrors `marketplace.json` under `~/.cursor/plugins/marketplaces/<slug>/`, and registers plugins in `~/.claude/plugins/installed_plugins.json` and `~/.claude/settings.json` so Cursor can load them. Use `./scripts/install_cursor_local.py --dry-run` to preview paths. Restart Cursor afterward.
+This copies each plugin listed in `.cursor-plugin/marketplace.json` into `~/.cursor/plugins/local/<name>/`, mirrors the manifest under `~/.cursor/plugins/marketplaces/<slug>/`, and registers plugins so Cursor can load them. Use `--dry-run` to preview. Restart Cursor afterward.
 
 ## Add another plugin
 
-1. Copy an existing plugin folder (e.g. `godev/`) to a new folder (use a short kebab-case id, e.g. `my-integration`).
-2. Edit `<plugin-id>/.cursor-plugin/plugin.json`: set `name`, `displayName`, `version`, `description`, paths like `skills` / `rules`, and metadata.
-3. Append an object to `plugins` in `.cursor-plugin/marketplace.json` with matching `name`, `source` (the folder name), and a short `description`.
-
-Publish the Git URL in Cursor’s marketplace flow when you are ready; optional fields such as `logo` can be added under each plugin as needed.
+1. Create a new folder (short kebab-case id, e.g. `my-tool`).
+2. Add both manifests:
+   - `<plugin-id>/.cursor-plugin/plugin.json`
+   - `<plugin-id>/.claude-plugin/plugin.json`
+3. Append an entry to both root marketplace files:
+   - `.cursor-plugin/marketplace.json`
+   - `.claude-plugin/marketplace.json`

@@ -1,0 +1,16 @@
+{
+  "name": "gitworkflow",
+  "version": "1.0.0",
+  "description": "Branch naming, commit drafting, staged-diff review, and PR summary generation via four workflow skills and commands.",
+  "author": {
+    "name": "jkaveri",
+    "email": "jkaveri@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/jkaveri/cursor-plugins",
+  "repository": "https://github.com/jkaveri/cursor-plugins",
+  "license": "MIT",
+  "keywords": ["git", "branch", "commit", "pull-request", "code-review"],
+  "skills": "./skills/",
+  "rules": "./rules/",
+  "commands": "./commands/"
+}

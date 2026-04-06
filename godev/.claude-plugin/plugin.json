@@ -1,0 +1,16 @@
+{
+  "name": "godev",
+  "version": "1.0.0",
+  "description": "Go project rules (style, modules/tooling, logging) and skills for table-driven tests, Go code review, and golog/v2 logging audit; includes go-test-writer agent.",
+  "author": {
+    "name": "jkaveri",
+    "email": "jkaveri@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/jkaveri/cursor-plugins",
+  "repository": "https://github.com/jkaveri/cursor-plugins",
+  "license": "MIT",
+  "keywords": ["go", "golang", "testing", "go-modules", "code-review", "logging", "table-driven-tests"],
+  "skills": "./skills/",
+  "rules": "./rules/",
+  "agents": "./agents/"
+}
