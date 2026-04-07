@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Cursor hook: afterFileEdit — remind to update docs when product code changes.
-# Exits 0 always; optional jq for JSON stdin. Paths under docs/ skip the reminder.
+# Cursor: afterFileEdit. Claude Code: PostToolUse (Write|Edit).
+# Reminds to update docs when product code changes. Exits 0 always.
 #
 # Optional env (comma-separated path prefixes, relative to repo root): WARN_DOC_CODE_PREFIXES
 # Default if unset: warn for any path not under docs/
@@ -12,7 +12,9 @@ payload="$(cat || true)"
 path=""
 if command -v jq >/dev/null 2>&1 && [[ -n "${payload//[$'\t\r\n ']/}" ]]; then
   path="$(echo "$payload" | jq -r '
-    (try .file_path catch empty)
+    (try .tool_input.file_path catch empty)
+    // (try .tool_response.filePath catch empty)
+    // (try .file_path catch empty)
     // (try .path catch empty)
     // (try .file catch empty)
     // (try .uri catch empty)

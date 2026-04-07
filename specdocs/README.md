@@ -1,6 +1,6 @@
 # Spec-Driven Docs (`specdocs`)
 
-Cursor plugin for **spec-driven documentation**: a canonical **`docs/`** tree, skills for feature specs and ADRs, doc sync checks, slash-style **commands**, and an optional **`afterFileEdit`** hook reminder. It lives in the [`jkaveri/cursor-plugins`](https://github.com/jkaveri/cursor-plugins) multi-plugin repo; see the root [README](../README.md) for marketplace layout.
+Cursor / Claude Code plugin for **spec-driven documentation**: a canonical **`docs/`** tree, skills for feature specs and ADRs, doc sync checks, slash-style **commands**, and an optional post-edit hook reminder (**Cursor:** `afterFileEdit`; **Claude Code:** `PostToolUse` on `Write`/`Edit`). It lives in the [`jkaveri/cursor-plugins`](https://github.com/jkaveri/cursor-plugins) multi-plugin repo; see the root [README](../README.md) for marketplace layout.
 
 Manifest: [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json).
 
@@ -71,7 +71,8 @@ Paths are relative to the `specdocs/` folder:
 | [`commands/spec-update.md`](commands/spec-update.md) | Entry: **update-spec-from-change**. |
 | [`commands/doc-sync-check.md`](commands/doc-sync-check.md) | Entry: **check-doc-sync**. |
 | [`commands/write-adr.md`](commands/write-adr.md) | Entry: **write-adr**. |
-| [`hooks.json`](hooks.json) | **`afterFileEdit`** → [`hooks/warn-missing-doc-updates/warn.sh`](hooks/warn-missing-doc-updates/warn.sh). |
+| [`hooks.json`](hooks.json) | **Claude Code:** `PostToolUse` (`Write` \| `Edit`) → [`warn.sh`](hooks/warn-missing-doc-updates/warn.sh). |
+| [`hooks.cursor.json`](hooks.cursor.json) | **Cursor:** `afterFileEdit` → same [`warn.sh`](hooks/warn-missing-doc-updates/warn.sh). |
 | [`hooks/warn-missing-doc-updates/README.md`](hooks/warn-missing-doc-updates/README.md) | Hook behavior, **`WARN_DOC_CODE_PREFIXES`**, project-local wiring. |
 
 ## Use without the full marketplace (manual copy)
@@ -79,7 +80,7 @@ Paths are relative to the `specdocs/` folder:
 1. Copy `rules/*.mdc` into your project’s `.cursor/rules/` (merge with existing rules).
 2. Copy each folder under `skills/` into `.cursor/skills/` (avoid duplicate skill names).
 3. Copy `commands/*.md` into `.cursor/commands/` if your Cursor version loads project commands from there.
-4. For hooks, copy `hooks.json` and the `hooks/` directory into `.cursor/` and adjust paths; see [`hooks/warn-missing-doc-updates/README.md`](hooks/warn-missing-doc-updates/README.md).
+4. For hooks, copy `hooks.cursor.json` (or `hooks.json` for Claude-only layouts) and the `hooks/` directory into `.cursor/` and adjust paths; see [`hooks/warn-missing-doc-updates/README.md`](hooks/warn-missing-doc-updates/README.md).
 
 ## Team Marketplace
 

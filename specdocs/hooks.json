@@ -1,9 +1,15 @@
 {
-  "version": 1,
+  "description": "Remind to update docs/specs/ or docs/decisions/ after Write or Edit (Claude Code PostToolUse).",
   "hooks": {
-    "afterFileEdit": [
+    "PostToolUse": [
       {
-        "command": "hooks/warn-missing-doc-updates/warn.sh"
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/warn-missing-doc-updates/warn.sh"
+          }
+        ]
       }
     ]
   }
